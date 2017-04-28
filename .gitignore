@@ -1,4 +1,8 @@
+# tensorflow stuff
+logs/
+uav_tfrecords/
 # Byte-compiled / optimized / DLL files
+
 __pycache__/
 *.py[cod]
 *$py.class
