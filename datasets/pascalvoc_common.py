@@ -30,7 +30,8 @@ UAV_LABELS = {
     'structure': (5, 'Structure'),
     'explosion': (6, 'Explosion'),
     'vehicle': (7, 'Vehicle'),
-    'antenna': (8, 'Antenna')
+    'antenna': (8, 'Antenna'),
+    'overlay': (9, 'Overlay')
 }
     
 

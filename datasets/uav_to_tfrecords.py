@@ -49,14 +49,17 @@ for each example.
 import os
 import sys
 import random
+import pprint
 
 import numpy as np
 import tensorflow as tf
 
+from collections import defaultdict
+
 import xml.etree.ElementTree as ET
 
 from datasets.dataset_utils import int64_feature, float_feature, bytes_feature
-from datasets.pascalvoc_common import VOC_LABELS
+from datasets.pascalvoc_common import UAV_LABELS
 
 # Original dataset organisation.
 DIRECTORY_ANNOTATIONS = 'Annotations/'
@@ -66,6 +69,18 @@ DIRECTORY_IMAGES = 'JPEGImages/'
 RANDOM_SEED = 4242
 SAMPLES_PER_FILES = 200
 
+
+# key is label, value is dict containing num_images and num_objects
+# num_images - Number of images with > 1 of that object 
+# num_objects - Total number of objects of this type
+label_counter = defaultdict(dict) 
+
+def setup_labelcounter():
+    for label in UAV_LABELS.keys():
+        label_counter[label]['num_images'] = 0
+        label_counter[label]['num_objects'] = 0
+    label_counter['_total_']['num_images'] = 0
+    label_counter['_total_']['num_objects'] = 0
 
 def _process_image(directory, name):
     """Process a image and annotation file.
@@ -100,8 +115,14 @@ def _process_image(directory, name):
     truncated = []
     for obj in root.findall('object'):
         label = obj.find('name').text
-        labels.append(int(VOC_LABELS[label][0]))
+        labels.append(int(UAV_LABELS[label][0]))
+        #labels.append(int(VOC_LABELS[label][0]))
         labels_text.append(label.encode('ascii'))
+    
+        # Counter
+        label_counter[label]['num_objects'] += 1
+        label_counter['_total_']['num_objects'] += 1
+            
 
         if obj.find('difficult'):
             difficult.append(int(obj.find('difficult').text))
@@ -118,6 +139,13 @@ def _process_image(directory, name):
                        float(bbox.find('ymax').text) / shape[0],
                        float(bbox.find('xmax').text) / shape[1]
                        ))
+
+    # increment file count
+    label_counter['_total_']['num_images'] += 1
+    uniq_labels = list(set(labels_text))
+    for label in uniq_labels:
+        label_counter[label.decode("utf-8")]['num_images'] += 1
+
     return image_data, shape, bboxes, labels, labels_text, difficult, truncated
 
 
@@ -184,7 +212,7 @@ def _get_output_filename(output_dir, name, idx):
     return '%s/%s_%03d.tfrecord' % (output_dir, name, idx)
 
 
-def run(dataset_dir, output_dir, name='voc_train', shuffling=False):
+def run(dataset_dir, output_dir, name='uav_train', shuffling=False):
     """Runs the conversion operation.
 
     Args:
@@ -193,6 +221,9 @@ def run(dataset_dir, output_dir, name='voc_train', shuffling=False):
     """
     if not tf.gfile.Exists(dataset_dir):
         tf.gfile.MakeDirs(dataset_dir)
+
+    # Setup labeler
+    setup_labelcounter()
 
     # Dataset filenames, and shuffling.
     path = os.path.join(dataset_dir, DIRECTORY_ANNOTATIONS)
@@ -225,4 +256,6 @@ def run(dataset_dir, output_dir, name='voc_train', shuffling=False):
     # Finally, write the labels file:
     # labels_to_class_names = dict(zip(range(len(_CLASS_NAMES)), _CLASS_NAMES))
     # dataset_utils.write_label_file(labels_to_class_names, dataset_dir)
-    print('\nFinished converting the Pascal VOC dataset!')
+    print('\nFinished converting the UAV dataset!')
+    pprint.pprint(label_counter)
+ 

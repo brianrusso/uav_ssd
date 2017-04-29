@@ -1,10 +1,10 @@
 DATASET_DIR=./uav_tfrecords
 TRAIN_DIR=./logs/
-CHECKPOINT_PATH=./checkpoints/ssd_300_vgg.ckpt
+CHECKPOINT_PATH=./uav_model/ssd_300_vgg.ckpt
 python3 train_ssd_network.py \
     --train_dir=${TRAIN_DIR} \
     --dataset_dir=${DATASET_DIR} \
-    --dataset_name=pascalvoc_2007\
+    --dataset_name=uav\
     --dataset_split_name=train \
     --model_name=ssd_300_vgg \
     --checkpoint_path=${CHECKPOINT_PATH} \
