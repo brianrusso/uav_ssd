@@ -1,7 +1,7 @@
 if [ ! -d uav_tfrecords ]; then
 	mkdir uav_tfrecords;
 fi
-DATASET_DIR=/home/brian/uav_ssd-data/middleeast_fmv/
+DATASET_DIR=../uav_ssd-data/middleeast_fmv/
 OUTPUT_DIR=./uav_tfrecords
 python3 tf_convert_data.py \
     --dataset_name=uav \
