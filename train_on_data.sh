@@ -1,6 +1,6 @@
 DATASET_DIR=./uav_tfrecords
 TRAIN_DIR=./logs/
-CHECKPOINT_PATH=./uav_model/ssd_300_vgg.ckpt
+CHECKPOINT_PATH=./uav_model/model.ckpt-406
 python3 train_ssd_network.py \
     --train_dir=${TRAIN_DIR} \
     --dataset_dir=${DATASET_DIR} \
